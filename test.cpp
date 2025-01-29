@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 // Test para Kruskal
-TEST(kruskal_test, basic_graph) {
+test(kruskal_test, basic_graph) {
     vector<vector<int>> graph = {
         {0, 2, 0, 6, 0},
         {2, 0, 3, 8, 5},
@@ -16,7 +16,7 @@ TEST(kruskal_test, basic_graph) {
 }
 
 // Test para Viajante
-TEST(viajante_test, simple_graph) {
+test(viajante_test, simple_graph) {
     vector<vector<int>> graph = {
         {0, 10, 15, 20},
         {10, 0, 35, 25},
@@ -28,7 +28,7 @@ TEST(viajante_test, simple_graph) {
 }
 
 // Test para Flujo Máximo (Edmonds-Karp)
-TEST(flujo_max_test, small_network) {
+test(flujo_max_test, small_network) {
     vector<vector<int>> capacity = {
         {0, 10, 5, 0, 0, 0},
         {0, 0, 15, 9, 0, 0},
@@ -41,7 +41,7 @@ TEST(flujo_max_test, small_network) {
 }
 
 // Test para Centrales más Cercanas
-TEST(central_test, basic_location) {
+test(central_test, basic_location) {
     vector<pair<int, int>> colonias = {{0, 0}, {5, 5}, {10, 10}};
     auto result = central_cerca(colonias);
     EXPECT_EQ(result.size(), 3);  // Debe asignar una central a cada colonia
