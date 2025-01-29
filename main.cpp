@@ -52,7 +52,7 @@ public:
     }
 };
 
-vector<Edge> getEdges(int N, const vector<vector<int>> &graph) {
+vector<Edge> GetEdges(int N, const vector<vector<int>> &graph) {
     vector<Edge> edges;
     for (int i = 0; i < N; ++i)
         for (int j = i + 1; j < N; ++j)
@@ -61,7 +61,7 @@ vector<Edge> getEdges(int N, const vector<vector<int>> &graph) {
 }
 
 vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph) {
-    vector<Edge> edges = getEdges(N, graph);
+    vector<Edge> edges = GetEdges(N, graph);
     sort(edges.begin(), edges.end());
     
     UnionFind uf(N);
