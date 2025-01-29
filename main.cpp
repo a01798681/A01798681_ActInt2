@@ -38,14 +38,18 @@ public:
     }
     
     int FindSet(int x) {
-        if (x != parent[x]) parent[x] = FindSet(parent[x]); // Path compression
+        if (x != parent[x]){
+            parent[x] = FindSet(parent[x]); // Path compression
+        }
         return parent[x];
     }
     
     void UnionSet(int x, int y) {
         int rx = FindSet(x), ry = FindSet(y);
         if (rx != ry) {
-            if (rank[rx] > rank[ry]) swap(rx, ry);
+            if (rank[rx] > rank[ry]){
+                    swap(rx, ry);
+            }
             parent[rx] = ry;
             if (rank[rx] == rank[ry]){
                  ++rank[ry];
