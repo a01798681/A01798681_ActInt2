@@ -167,7 +167,9 @@ vector<pair<int, int>> central_cerca(const vector<pair<int, int>> &colonias) {
         double min_dist = INF;
         pair<int, int> mejor_central = colonias[i];  // Si no encuentra mejor, se queda igual
         for (int j = 0; j < colonias.size(); ++j) {
-            if (i == j) continue;  // No comparar consigo misma
+            if (i == j){
+                    continue;
+            }
             double dist = sqrt(pow(colonias[i].first - colonias[j].first, 2) + 
                                pow(colonias[i].second - colonias[j].second, 2));
             if (dist < min_dist) {
