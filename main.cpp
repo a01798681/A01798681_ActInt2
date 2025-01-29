@@ -30,21 +30,21 @@ struct Edge {
 };
 
 // Disjoint Set (Union-Find) with Path Compression
-class disjoint_set {
+class DisjointSet {
 private:
     vector<int> parent, rank;
 
 public:
-    disjoint_set(int N) : parent(N), rank(N, 0) {
+    DisjointSet(int N) : parent(N), rank(N, 0) {
         for (int i = 0; i < N; ++i) parent[i] = i;
     }
-    int find(int x) {
+    int findSet(int x) {
         if (parent[x] != x)
-            parent[x] = find(parent[x]);  // Path compression
+            parent[x] = findSet(parent[x]);  // Path compression
         return parent[x];
     }
-    void union_sets(int x, int y) {
-        int rootX = find(x), rootY = find(y);
+    void unionSets(int x, int y) {
+        int rootX = findSet(x), rootY = findSet(y);
         if (rootX != rootY) {
             if (rank[rootX] > rank[rootY])
                 parent[rootY] = rootX;
@@ -74,13 +74,13 @@ vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph) {
                 edges.push_back({i, j, graph[i][j]});
 
     sort(edges.begin(), edges.end());
-    disjoint_set ds(N);
+    DisjointSet ds(N);
 
     // Build MST using Kruskal's Algorithm
     for (const auto &edge : edges) {
-        if (ds.find(edge.u) != ds.find(edge.v)) {
+        if (ds.findSet(edge.u) != ds.findSet(edge.v)) {
             result.push_back(edge);
-            ds.union_sets(edge.u, edge.v);
+            ds.unionSets(edge.u, edge.v);
         }
     }
     return result;
