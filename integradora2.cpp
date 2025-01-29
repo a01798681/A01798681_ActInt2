@@ -143,21 +143,30 @@ int flujo_max(int N, const vector<vector<int>> &capacity, int source, int sink){
  * @param centrals Vector de coordenadas (x, y) de las centrales.
  * @return Un vector donde cada índice indica la central más cercana a la ubicación correspondiente.
  */
-vector<int> central_cerca(int N, const vector<pair<int, int>> &ubicacion, const vector<pair<int, int>> &centrals){
-    vector<int> closest(N, -1);
-    for (int i = 0; i < N; ++i){
+vector<pair<int, int>> central_cerca(const vector<pair<int, int>> &colonias) {
+    vector<pair<int, int>> resultado(colonias.size());
+
+    for (int i = 0; i < colonias.size(); ++i) {
         double min_dist = INF;
-        for (int j = 0; j < centrals.size(); ++j){
-            double dist = sqrt(pow(ubicacion[i].first - centrals[j].first, 2) +
-                               pow(ubicacion[i].second - centrals[j].second, 2));
-            if (dist < min_dist){
+        pair<int, int> mejor_central = colonias[i];  // Si no encuentra mejor, se queda igual
+
+        for (int j = 0; j < colonias.size(); ++j) {
+            if (i == j) continue;  // No comparar consigo misma
+
+            double dist = sqrt(pow(colonias[i].first - colonias[j].first, 2) + 
+                               pow(colonias[i].second - colonias[j].second, 2));
+
+            if (dist < min_dist) {
                 min_dist = dist;
-                closest[i] = j;
+                mejor_central = colonias[j];  // Se asigna la mejor central
             }
         }
+        resultado[i] = mejor_central;
     }
-    return closest;
+    return resultado;
 }
+
+
 /*
  * @brief Función principal que lee los datos de entrada y llama a las funciones anteriores.
  * @return 0 si el programa se ejecuta correctamente.
@@ -187,9 +196,10 @@ int main(){
         cin >> temp >> ubicacion[i].first >> temp >> ubicacion[i].second >> temp;
     }
 
+    cout << "\nSALIDA:";
     // 1. Minimum Spanning Tree
     auto mst = kruskal_mst(N, graph);
-    cout << "Forma de cablear las colonias con fibra (A,B):\n";
+    cout << "\nForma de cablear las colonias con fibra (A,B):\n";
     for (const auto &edge : mst) {
         cout << "(" << char('A' + edge.u) << ", " << char('A' + edge.v) << ")\n";
     }
@@ -205,13 +215,14 @@ int main(){
     // 3. Maximum Flow
     int source = 0, sink = N - 1;
     int max_flujo = flujo_max(N, capacity, source, sink);
-    cout << "flujo máximo de información: " << max_flujo << "\n";
+    cout << "flujo maximo de informacion: " << max_flujo << "\n";
 
     // 4. Closest Centrals
-    auto closest = central_cerca(N, ubicacion, ubicacion);
+    auto nuevos_puntos = central_cerca(ubicacion); // Se asume que algunas ubicaciones son centrales
     cout << "lista de poligonos:\n";
-    for (int i = 0; i < N; ++i) {
-        cout << char('A' + i) << " -> " << closest[i] << "\n";
+    for (const auto &punto : nuevos_puntos) {
+        cout << "(" << punto.first << ", " << punto.second << ")\n";
     }
+
     return 0;
 }
