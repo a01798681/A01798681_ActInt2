@@ -38,13 +38,13 @@ public:
     DisjointSet(int N) : parent(N), rank(N, 0) {
         for (int i = 0; i < N; ++i) parent[i] = i;
     }
-    int findSet(int x) {
+    int FindSet(int x) {
         if (parent[x] != x)
-            parent[x] = findSet(parent[x]);  // Path compression
+            parent[x] = FindSet(parent[x]);  // Path compression
         return parent[x];
     }
-    void unionSets(int x, int y) {
-        int rootX = findSet(x), rootY = findSet(y);
+    void UnionSets(int x, int y) {
+        int rootX = FindSet(x), rootY = FindSet(y);
         if (rootX != rootY) {
             if (rank[rootX] > rank[rootY])
                 parent[rootY] = rootX;
@@ -78,9 +78,9 @@ vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph) {
 
     // Build MST using Kruskal's Algorithm
     for (const auto &edge : edges) {
-        if (ds.findSet(edge.u) != ds.findSet(edge.v)) {
+        if (ds.FindSet(edge.u) != ds.FindSet(edge.v)) {
             result.push_back(edge);
-            ds.unionSets(edge.u, edge.v);
+            ds.UnionSets(edge.u, edge.v);
         }
     }
     return result;
