@@ -118,7 +118,9 @@ int flujo_max(int N, const vector<vector<int>> &capacity, int source, int sink){
                 if (parent[next] == -1 && residual[node][next] > 0){
                     parent[next] = node;
                     int newFlow = min(flow, residual[node][next]);
-                    if (next == sink) return newFlow;
+                    if (next == sink){
+                         return newFlow;
+                    }
                     q.push({next, newFlow});
                 }
             }
