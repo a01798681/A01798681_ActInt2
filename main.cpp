@@ -22,50 +22,55 @@ using namespace std;
 
 const int INF = numeric_limits<int>::max();
 
-struct Edge{
+struct Edge {
     int u, v, peso;
-    bool operator<(const Edge &other) const{
+    bool operator<(const Edge &other) const {
         return peso < other.peso;
     }
 };
 
-/*
- * @brief Encuentra el spanning tree utilizando el algoritmo de Kruskal.
- * @param N Número de nodos en el grafo.
- * @param graph Matriz de adyacencia que representa el grafo.
- * @return Un vector de aristas que forman el árbol de expansión mínima.
- */
-vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph){
-    vector<Edge> edges, result;
-    vector<int> parent(N), rank(N, 0);
-    for (int i = 0; i < N; ++i) parent[i] = i;
-    auto find = [&](int x){
-        while (x != parent[x]) x = parent[x];
-        return x;
-    };
-    auto conjunto_set = [&](int x, int y){
+class UnionFind {
+public:
+    vector<int> parent, rank;
+    
+    UnionFind(int N) : parent(N), rank(N, 0) {
+        for (int i = 0; i < N; ++i) parent[i] = i;
+    }
+    
+    int find(int x) {
+        if (x != parent[x]) parent[x] = find(parent[x]); // Path compression
+        return parent[x];
+    }
+    
+    void unionSet(int x, int y) {
         int rx = find(x), ry = find(y);
-        if (rx != ry){
-            if (rank[rx] > rank[ry])
-                parent[ry] = rx;
-            else if (rank[rx] < rank[ry])
-                parent[ry] = ry;
-            else
-                parent[ry] = rx, ++rank[rx];
-        }
-    };
-    for (int i = 0; i < N; ++i){
-        for (int j = i + 1; j < N; ++j){
-            if (graph[i][j] > 0){
-                edges.push_back({i, j, graph[i][j]});
-            }
+        if (rx != ry) {
+            if (rank[rx] > rank[ry]) swap(rx, ry);
+            parent[rx] = ry;
+            if (rank[rx] == rank[ry]) ++rank[ry];
         }
     }
+};
+
+vector<Edge> getEdges(int N, const vector<vector<int>> &graph) {
+    vector<Edge> edges;
+    for (int i = 0; i < N; ++i)
+        for (int j = i + 1; j < N; ++j)
+            if (graph[i][j] > 0) edges.push_back({i, j, graph[i][j]});
+    return edges;
+}
+
+vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph) {
+    vector<Edge> edges = getEdges(N, graph);
     sort(edges.begin(), edges.end());
-    for (const auto &edge : edges){
-        if (find(edge.u) != find(edge.v)){
+    
+    UnionFind uf(N);
+    vector<Edge> result;
+
+    for (const auto &edge : edges) {
+        if (uf.find(edge.u) != uf.find(edge.v)) {
             result.push_back(edge);
-            conjunto_set(edge.u, edge.v);
+            uf.unionSet(edge.u, edge.v);
         }
     }
     return result;
