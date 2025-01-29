@@ -47,7 +47,9 @@ public:
         if (rx != ry) {
             if (rank[rx] > rank[ry]) swap(rx, ry);
             parent[rx] = ry;
-            if (rank[rx] == rank[ry]) ++rank[ry];
+            if (rank[rx] == rank[ry]){
+                 ++rank[ry];
+            }
         }
     }
 };
@@ -56,7 +58,9 @@ vector<Edge> get_edges(int N, const vector<vector<int>> &graph) {
     vector<Edge> edges;
     for (int i = 0; i < N; ++i)
         for (int j = i + 1; j < N; ++j)
-            if (graph[i][j] > 0) edges.push_back({i, j, graph[i][j]});
+            if (graph[i][j] > 0){
+                 edges.push_back({i, j, graph[i][j]});
+            }
     return edges;
 }
 
