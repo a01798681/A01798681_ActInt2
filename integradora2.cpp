@@ -143,17 +143,14 @@ int flujo_max(int N, const vector<vector<int>> &capacity, int source, int sink){
  * @param centrals Vector de coordenadas (x, y) de las centrales.
  * @return Un vector donde cada índice indica la central más cercana a la ubicación correspondiente.
  */
-vector<pair<int, int>> central_cerca(const vector<pair<int, int>> &colonias) {
+vector<pair<int, int>> central_cerca(const vector<pair<int, int>> &colonias){
     vector<pair<int, int>> resultado(colonias.size());
-
-    for (int i = 0; i < colonias.size(); ++i) {
+    for (int i = 0; i < colonias.size(); ++i){
         double min_dist = INF;
         pair<int, int> mejor_central = colonias[i];  // Si no encuentra mejor, se queda igual
-
-        for (int j = 0; j < colonias.size(); ++j) {
-            double dist = sqrt(pow(colonias[i].first - colonias[j].first, 2) + 
-                               pow(colonias[i].second - colonias[j].second, 2));
-            if (dist < min_dist) {
+        for (int j = 0; j < colonias.size(); ++j){
+            double dist = sqrt(pow(colonias[i].first - colonias[j].first, 2) + pow(colonias[i].second - colonias[j].second, 2));
+            if (dist < min_dist){
                 min_dist = dist;
                 mejor_central = colonias[j];  // Se asigna la mejor central
             }
@@ -197,14 +194,14 @@ int main(){
     // 1. Minimum Spanning Tree
     auto mst = kruskal_mst(N, graph);
     cout << "\nForma de cablear las colonias con fibra (A,B):\n";
-    for (const auto &edge : mst) {
+    for (const auto &edge : mst){
         cout << "(" << char('A' + edge.u) << ", " << char('A' + edge.v) << ")\n";
     }
 
     // 2. Traveling Salesman Problem
     auto [minCost, bestRoute] = viajante(N, graph);
     cout << "ruta a seguir por el personal:\n";
-    for (int city : bestRoute) {
+    for (int city : bestRoute){
         cout << char('A' + city) << " ";
     }
     cout << char('A' + bestRoute[0]) << "\n";
@@ -217,7 +214,7 @@ int main(){
     // 4. Closest Centrals
     auto nuevos_puntos = central_cerca(ubicacion); // Se asume que algunas ubicaciones son centrales
     cout << "lista de poligonos:\n";
-    for (const auto &punto : nuevos_puntos) {
+    for (const auto &punto : nuevos_puntos){
         cout << "(" << punto.first << ", " << punto.second << ")\n";
     }
 
