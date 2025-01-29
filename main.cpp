@@ -37,13 +37,13 @@ public:
         for (int i = 0; i < N; ++i) parent[i] = i;
     }
     
-    int find(int x) {
-        if (x != parent[x]) parent[x] = find(parent[x]); // Path compression
+    int FindSet(int x) {
+        if (x != parent[x]) parent[x] = FindSet(parent[x]); // Path compression
         return parent[x];
     }
     
-    void unionSet(int x, int y) {
-        int rx = find(x), ry = find(y);
+    void UnionSet(int x, int y) {
+        int rx = FindSet(x), ry = FindSet(y);
         if (rx != ry) {
             if (rank[rx] > rank[ry]) swap(rx, ry);
             parent[rx] = ry;
@@ -68,9 +68,9 @@ vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph) {
     vector<Edge> result;
 
     for (const auto &edge : edges) {
-        if (uf.find(edge.u) != uf.find(edge.v)) {
+        if (uf.FindSet(edge.u) != uf.FindSet(edge.v)) {
             result.push_back(edge);
-            uf.unionSet(edge.u, edge.v);
+            uf.UnionSet(edge.u, edge.v);
         }
     }
     return result;
