@@ -107,50 +107,48 @@ pair<int, vector<int>> viajante(int N, const vector<vector<int>> &graph){
     return {minCost, mejor_ruta};
 }
 
-/*
- * @brief Calcula el flujo máximo en un grafo utilizando el algoritmo de Edmonds-Karp.
- * @param N Número de nodos en el grafo.
- * @param capacity Matriz de capacidades de las aristas.
- * @param source Nodo fuente.
- * @param sink Nodo sumidero.
- * @return El flujo máximo desde el nodo fuente al sumidero.
- */
-int flujo_max(int N, const vector<vector<int>> &capacity, int source, int sink){
-    vector<vector<int>> residual = capacity;
-    vector<int> parent(N);
-    auto bfs = [&](){
-        fill(parent.begin(), parent.end(), -1);
-        queue<pair<int, int>> q;
-        q.push({source, INF});
-        parent[source] = source;
-        while (!q.empty()){
-            int node = q.front().first;
-            int flow = q.front().second;
-            q.pop();
-            for (int next = 0; next < N; ++next){
-                if (parent[next] == -1 && residual[node][next] > 0){
-                    parent[next] = node;
-                    int newFlow = min(flow, residual[node][next]);
-                    if (next == sink){
-                         return newFlow;
-                    }
-                    q.push({next, newFlow});
-                }
+int bfs(int N, vector<vector<int>> &residual, vector<int> &parent, int source, int sink) {
+    fill(parent.begin(), parent.end(), -1);
+    queue<pair<int, int>> q;
+    q.push({source, INF});
+    parent[source] = source;
+
+    while (!q.empty()) {
+        auto [node, flow] = q.front();
+        q.pop();
+        
+        for (int next = 0; next < N; ++next) {
+            if (parent[next] == -1 && residual[node][next] > 0) {
+                parent[next] = node;
+                int newFlow = min(flow, residual[node][next]);
+                if (next == sink) return newFlow;
+                q.push({next, newFlow});
             }
         }
-        return 0;
-    };
-    int max_flujo = 0, flow;
-    while ((flow = bfs())){
-        max_flujo += flow;
-        int cur = sink;
-        while (cur != source){
-            int prev = parent[cur];
-            residual[prev][cur] -= flow;
-            residual[cur][prev] += flow;
-            cur = prev;
-        }
     }
+    return 0;
+}
+
+void updateFlow(vector<vector<int>> &residual, const vector<int> &parent, int flow, int source, int sink) {
+    int cur = sink;
+    while (cur != source) {
+        int prev = parent[cur];
+        residual[prev][cur] -= flow;
+        residual[cur][prev] += flow;
+        cur = prev;
+    }
+}
+
+int flujo_max(int N, const vector<vector<int>> &capacity, int source, int sink) {
+    vector<vector<int>> residual = capacity;
+    vector<int> parent(N);
+    int max_flujo = 0, flow;
+
+    while ((flow = bfs(N, residual, parent, source, sink))) {
+        max_flujo += flow;
+        updateFlow(residual, parent, flow, source, sink);
+    }
+
     return max_flujo;
 }
 
