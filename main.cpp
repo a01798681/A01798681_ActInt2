@@ -22,39 +22,10 @@ using namespace std;
 
 const int INF = numeric_limits<int>::max();
 
-struct Edge {
+struct Edge{
     int u, v, peso;
-    bool operator<(const Edge &other) const {
+    bool operator<(const Edge &other) const{
         return peso < other.peso;
-    }
-};
-
-// Disjoint Set (Union-Find) with Path Compression
-class DisjointSet {
-private:
-    vector<int> parent, rank;
-
-public:
-    DisjointSet(int N) : parent(N), rank(N, 0) {
-        for (int i = 0; i < N; ++i) parent[i] = i;
-    }
-    int FindSet(int x) {
-        if (parent[x] != x)
-            parent[x] = FindSet(parent[x]);  // Path compression
-        return parent[x];
-    }
-    void UnionSets(int x, int y) {
-        int rootX = FindSet(x), rootY = FindSet(y);
-        if (rootX != rootY) {
-            if (rank[rootX] > rank[rootY])
-                parent[rootY] = rootX;
-            else if (rank[rootX] < rank[rootY])
-                parent[rootX] = rootY;
-            else {
-                parent[rootY] = rootX;
-                ++rank[rootX];
-            }
-        }
     }
 };
 
@@ -64,23 +35,37 @@ public:
  * @param graph Matriz de adyacencia que representa el grafo.
  * @return Un vector de aristas que forman el árbol de expansión mínima.
  */
-vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph) {
+vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph){
     vector<Edge> edges, result;
-    
-    // Construct edges list
-    for (int i = 0; i < N; ++i)
-        for (int j = i + 1; j < N; ++j)
-            if (graph[i][j] > 0)
+    vector<int> parent(N), rank(N, 0);
+    for (int i = 0; i < N; ++i) parent[i] = i;
+    auto find = [&](int x){
+        while (x != parent[x]) x = parent[x];
+        return x;
+    };
+    auto conjunto_set = [&](int x, int y){
+        int rx = find(x), ry = find(y);
+        if (rx != ry){
+            if (rank[rx] > rank[ry])
+                parent[ry] = rx;
+            else if (rank[rx] < rank[ry])
+                parent[ry] = ry;
+            else
+                parent[ry] = rx, ++rank[rx];
+        }
+    };
+    for (int i = 0; i < N; ++i){
+        for (int j = i + 1; j < N; ++j){
+            if (graph[i][j] > 0){
                 edges.push_back({i, j, graph[i][j]});
-
+            }
+        }
+    }
     sort(edges.begin(), edges.end());
-    DisjointSet ds(N);
-
-    // Build MST using Kruskal's Algorithm
-    for (const auto &edge : edges) {
-        if (ds.FindSet(edge.u) != ds.FindSet(edge.v)) {
+    for (const auto &edge : edges){
+        if (find(edge.u) != find(edge.v)){
             result.push_back(edge);
-            ds.UnionSets(edge.u, edge.v);
+            conjunto_set(edge.u, edge.v);
         }
     }
     return result;
@@ -133,9 +118,7 @@ int flujo_max(int N, const vector<vector<int>> &capacity, int source, int sink){
                 if (parent[next] == -1 && residual[node][next] > 0){
                     parent[next] = node;
                     int newFlow = min(flow, residual[node][next]);
-                    if (next == sink){
-                        return newFlow;
-                    }
+                    if (next == sink) return newFlow;
                     q.push({next, newFlow});
                 }
             }
@@ -163,14 +146,16 @@ int flujo_max(int N, const vector<vector<int>> &capacity, int source, int sink){
  * @param centrals Vector de coordenadas (x, y) de las centrales.
  * @return Un vector donde cada índice indica la central más cercana a la ubicación correspondiente.
  */
-vector<pair<int, int>> central_cerca(const vector<pair<int, int>> &colonias){
+vector<pair<int, int>> central_cerca(const vector<pair<int, int>> &colonias) {
     vector<pair<int, int>> resultado(colonias.size());
-    for (int i = 0; i < colonias.size(); ++i){
+    for (int i = 0; i < colonias.size(); ++i) {
         double min_dist = INF;
         pair<int, int> mejor_central = colonias[i];  // Si no encuentra mejor, se queda igual
-        for (int j = 0; j < colonias.size(); ++j){
-            double dist = sqrt(pow(colonias[i].first - colonias[j].first, 2) + pow(colonias[i].second - colonias[j].second, 2));
-            if (dist < min_dist){
+        for (int j = 0; j < colonias.size(); ++j) {
+            if (i == j) continue;  // No comparar consigo misma
+            double dist = sqrt(pow(colonias[i].first - colonias[j].first, 2) + 
+                               pow(colonias[i].second - colonias[j].second, 2));
+            if (dist < min_dist) {
                 min_dist = dist;
                 mejor_central = colonias[j];  // Se asigna la mejor central
             }
