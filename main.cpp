@@ -121,7 +121,9 @@ int bfs(int N, vector<vector<int>> &residual, vector<int> &parent, int source, i
             if (parent[next] == -1 && residual[node][next] > 0) {
                 parent[next] = node;
                 int newFlow = min(flow, residual[node][next]);
-                if (next == sink) return newFlow;
+                if (next == sink){
+                    return newFlow;
+                }
                 q.push({next, newFlow});
             }
         }
@@ -129,7 +131,7 @@ int bfs(int N, vector<vector<int>> &residual, vector<int> &parent, int source, i
     return 0;
 }
 
-void updateFlow(vector<vector<int>> &residual, const vector<int> &parent, int flow, int source, int sink) {
+void UpdateFlow(vector<vector<int>> &residual, const vector<int> &parent, int flow, int source, int sink) {
     int cur = sink;
     while (cur != source) {
         int prev = parent[cur];
@@ -146,7 +148,7 @@ int flujo_max(int N, const vector<vector<int>> &capacity, int source, int sink) 
 
     while ((flow = bfs(N, residual, parent, source, sink))) {
         max_flujo += flow;
-        updateFlow(residual, parent, flow, source, sink);
+        UpdateFlow(residual, parent, flow, source, sink);
     }
 
     return max_flujo;
