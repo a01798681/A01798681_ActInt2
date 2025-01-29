@@ -22,10 +22,41 @@ using namespace std;
 
 const int INF = numeric_limits<int>::max();
 
-struct Edge{
+struct Edge {
     int u, v, peso;
-    bool operator<(const Edge &other) const{
+    bool operator<(const Edge &other) const {
         return peso < other.peso;
+    }
+};
+
+// Disjoint Set (Union-Find) with Path Compression
+class DisjointSet {
+private:
+    vector<int> parent, rank;
+
+public:
+    DisjointSet(int N) : parent(N), rank(N, 0) {
+        for (int i = 0; i < N; ++i) parent[i] = i;
+    }
+
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]);  // Path compression
+        return parent[x];
+    }
+
+    void union_sets(int x, int y) {
+        int rootX = find(x), rootY = find(y);
+        if (rootX != rootY) {
+            if (rank[rootX] > rank[rootY])
+                parent[rootY] = rootX;
+            else if (rank[rootX] < rank[rootY])
+                parent[rootX] = rootY;
+            else {
+                parent[rootY] = rootX;
+                ++rank[rootX];
+            }
+        }
     }
 };
 
@@ -35,37 +66,23 @@ struct Edge{
  * @param graph Matriz de adyacencia que representa el grafo.
  * @return Un vector de aristas que forman el árbol de expansión mínima.
  */
-vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph){
+vector<Edge> kruskal_mst(int N, const vector<vector<int>> &graph) {
     vector<Edge> edges, result;
-    vector<int> parent(N), rank(N, 0);
-    for (int i = 0; i < N; ++i) parent[i] = i;
-    auto find = [&](int x){
-        while (x != parent[x]) x = parent[x];
-        return x;
-    };
-    auto conjunto_set = [&](int x, int y){
-        int rx = find(x), ry = find(y);
-        if (rx != ry){
-            if (rank[rx] > rank[ry])
-                parent[ry] = rx;
-            else if (rank[rx] < rank[ry])
-                parent[ry] = ry;
-            else
-                parent[ry] = rx, ++rank[rx];
-        }
-    };
-    for (int i = 0; i < N; ++i){
-        for (int j = i + 1; j < N; ++j){
-            if (graph[i][j] > 0){
+    
+    // Construct edges list
+    for (int i = 0; i < N; ++i)
+        for (int j = i + 1; j < N; ++j)
+            if (graph[i][j] > 0)
                 edges.push_back({i, j, graph[i][j]});
-            }
-        }
-    }
+
     sort(edges.begin(), edges.end());
-    for (const auto &edge : edges){
-        if (find(edge.u) != find(edge.v)){
+    DisjointSet ds(N);
+
+    // Build MST using Kruskal's Algorithm
+    for (const auto &edge : edges) {
+        if (ds.find(edge.u) != ds.find(edge.v)) {
             result.push_back(edge);
-            conjunto_set(edge.u, edge.v);
+            ds.union_sets(edge.u, edge.v);
         }
     }
     return result;
