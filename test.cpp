@@ -1,6 +1,7 @@
 
-#include "main.cpp"
+#include "integradora.h"
 #include <gtest/gtest.h>
+using namespace std;
 
 // Test para Kruskal
 TEST(kruskal_test, basic_graph) {

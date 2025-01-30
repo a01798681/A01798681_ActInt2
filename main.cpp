@@ -9,54 +9,40 @@ Actividad Integradora 2
  * Fecha de creación: 26/01/25
  */
 
-#ifndef GRAFO_ALGORITMOS_H
-#define GRAFO_ALGORITMOS_H
-
 #include <iostream>
 #include <vector>
 #include <queue>
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include "integradora.h"
 using namespace std;
 
 const int INF = numeric_limits<int>::max();
 
-struct Edge {
-    int u, v, peso;
-    bool operator<(const Edge &other) const {
-        return peso < other.peso;
-    }
-};
+UnionFind::UnionFind(int N) : parent(N), rank(N, 0) {
+    for (int i = 0; i < N; ++i) parent[i] = i;
+}
 
-class UnionFind {
-public:
-    vector<int> parent, rank;
-    
-    UnionFind(int N) : parent(N), rank(N, 0) {
-        for (int i = 0; i < N; ++i) parent[i] = i;
+int UnionFind::FindSet(int x) {
+    if (x != parent[x]){
+        parent[x] = FindSet(parent[x]); // Path compression
     }
-    
-    int FindSet(int x) {
-        if (x != parent[x]){
-            parent[x] = FindSet(parent[x]); // Path compression
+    return parent[x];
+}
+
+void UnionFind::UnionSet(int x, int y) {
+    int rx = FindSet(x), ry = FindSet(y);
+    if (rx != ry) {
+        if (rank[rx] > rank[ry]){
+            swap(rx, ry);
         }
-        return parent[x];
-    }
-    
-    void UnionSet(int x, int y) {
-        int rx = FindSet(x), ry = FindSet(y);
-        if (rx != ry) {
-            if (rank[rx] > rank[ry]){
-                    swap(rx, ry);
-            }
-            parent[rx] = ry;
-            if (rank[rx] == rank[ry]){
-                 ++rank[ry];
-            }
+        parent[rx] = ry;
+        if (rank[rx] == rank[ry]){
+            ++rank[ry];
         }
     }
-};
+}
 
 vector<Edge> get_edges(int N, const vector<vector<int>> &graph) {
     vector<Edge> edges;
@@ -181,5 +167,3 @@ vector<pair<int, int>> central_cerca(const vector<pair<int, int>> &colonias) {
     }
     return resultado;
 }
-
-#endif
